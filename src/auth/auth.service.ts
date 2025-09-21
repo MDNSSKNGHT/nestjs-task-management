@@ -1,0 +1,66 @@
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { QueryFailedError, Repository } from 'typeorm';
+import { User } from './user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { DatabaseError } from 'pg';
+import { PgErrorCodes } from 'src/auth/pg-error-codes.enum';
+import { compare, genSalt, hash } from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './jwt-payload.interface';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService,
+  ) {}
+
+  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+    const { username, password } = authCredentialsDto;
+
+    const salt = await genSalt();
+    const hashedPassword = await hash(password, salt);
+
+    const user = this.userRepository.create({
+      username,
+      password: hashedPassword,
+    });
+
+    try {
+      await this.userRepository.save(user);
+    } catch (error: unknown) {
+      if (error instanceof QueryFailedError) {
+        const pgError = error.driverError as DatabaseError;
+
+        if (pgError.code === PgErrorCodes.UNIQUE_CONSTRAINT_VIOLATION) {
+          throw new ConflictException('Username already exists');
+        }
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
+  }
+
+  async signIn(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<{ accessToken: string }> {
+    const { username, password } = authCredentialsDto;
+
+    const user = await this.userRepository.findOne({ where: { username } });
+    const validCredentials = user && (await compare(password, user.password));
+
+    if (validCredentials) {
+      const payload: JwtPayload = { username };
+      const accessToken = this.jwtService.sign(payload);
+      return { accessToken };
+    } else {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+  }
+}
