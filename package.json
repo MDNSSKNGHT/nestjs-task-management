@@ -27,6 +27,8 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
     "@types/bcrypt": "^6.0.0",
+    "@types/passport": "^1.0.17",
+    "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.15.5",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
