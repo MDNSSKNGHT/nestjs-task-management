@@ -1,0 +1,84 @@
+{
+	"info": {
+		"_postman_id": "4386eb8e-1244-4076-ac72-4a49858e9eb9",
+		"name": "Tasks Management Auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47389848",
+		"_collection_link": "https://mdnssknght-6369900.postman.co/workspace/Leonardo's-Team's-Workspace~645802c5-4b00-4f48-8be7-95219894b122/collection/47389848-4386eb8e-1244-4076-ac72-4a49858e9eb9?action=share&source=collection_link&creator=47389848"
+	},
+	"item": [
+		{
+			"name": "Sign Up",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseURL}}/auth/signup",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign In",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseURL}}/auth/signin",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"auth",
+						"signin"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
