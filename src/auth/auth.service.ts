@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { QueryFailedError, Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -9,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { DatabaseError } from 'pg';
 import { PgErrorCodes } from 'src/lib/pg-error-codes';
-import { genSalt, hash } from 'bcrypt';
+import { compare, genSalt, hash } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -43,5 +44,16 @@ export class AuthService {
     }
   }
 
-  async signIn() {}
+  async signIn(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+    const { username, password } = authCredentialsDto;
+
+    const user = await this.userRepository.findOne({ where: { username } });
+    const validCredentials = user && (await compare(password, user.password));
+
+    if (validCredentials) {
+      return '';
+    } else {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+  }
 }
