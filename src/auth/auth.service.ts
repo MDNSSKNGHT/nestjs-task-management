@@ -9,7 +9,7 @@ import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { DatabaseError } from 'pg';
-import { PgErrorCodes } from 'src/lib/pg-error-codes';
+import { PgErrorCodes } from 'src/auth/pg-error-codes.enum';
 import { compare, genSalt, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
