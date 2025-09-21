@@ -11,11 +11,14 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { DatabaseError } from 'pg';
 import { PgErrorCodes } from 'src/lib/pg-error-codes';
 import { compare, genSalt, hash } from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
@@ -44,14 +47,18 @@ export class AuthService {
     }
   }
 
-  async signIn(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+  async signIn(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<{ accessToken: string }> {
     const { username, password } = authCredentialsDto;
 
     const user = await this.userRepository.findOne({ where: { username } });
     const validCredentials = user && (await compare(password, user.password));
 
     if (validCredentials) {
-      return '';
+      const payload: JwtPayload = { username };
+      const accessToken = this.jwtService.sign(payload);
+      return { accessToken };
     } else {
       throw new UnauthorizedException('Invalid credentials');
     }
